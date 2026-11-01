@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+config_home=${XDG_CONFIG_HOME:-$HOME/.config}
+[[ $config_home == /* && $config_home != / ]] || {
+  echo "XDG_CONFIG_HOME must be a safe absolute path: $config_home" >&2
+  exit 1
+}
+target=$config_home/omarchy/plugins/bszwakop.commands
+command -v rsync >/dev/null || { echo "rsync is required" >&2; exit 1; }
+omarchy plugin validate "$root"
+mkdir -p "$target"
+rsync -a --delete \
+  --exclude='.git/' --exclude='.gitignore' --exclude='scripts/' --exclude='tests/' --exclude='__pycache__/' \
+  "$root/" "$target/"
+chmod 700 "$target/helper.py"
+omarchy-shell shell rescanPlugins
+printf 'Installed copy updated: %s\n' "$target"

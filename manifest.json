@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "bszwakop.commands",
+  "name": "Komendy",
+  "version": "1.0.0",
+  "author": "bszwakop",
+  "description": "Przeszukiwanie własnych komend z paska, kopiowanie do schowka i synchronizacja katalogu.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {"barWidget": "Panel.qml"},
+  "barWidget": {
+    "displayName": "Komendy",
+    "category": "Utilities",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
