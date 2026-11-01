@@ -64,11 +64,7 @@ Panel {
         if (layout === "compact") return false
         return card.availableCardWidth >= Style.space(760)
     }
-    readonly property int listCardHeight: {
-        var count = rows.length
-        var list = count === 0 ? Style.space(140) : Math.min(Style.space(440), count * Style.space(56) + Style.space(8))
-        return list + Style.space(168)
-    }
+    readonly property int listCardHeight: Style.space(440) + Style.space(168)
     readonly property string shownTip: {
         var pins = pinnedCommands()
         if (wheelIndex >= 0 && wheelIndex < pins.length) return pins[wheelIndex].title
@@ -988,17 +984,27 @@ Panel {
                         implicitWidth: keyScope.width
                         Layout.preferredWidth: keyScope.width
                         Layout.alignment: Qt.AlignTop
-                        Layout.preferredHeight: {
-                            var content = commandColumn.implicitHeight
-                            if (content < Style.space(40)) content = Math.max(root.rows.length, 1) * Style.space(56)
-                            return Math.min(content, Style.space(440))
-                        }
+                        Layout.preferredHeight: Style.space(440)
                         clip: true
                         contentWidth: width
                         contentHeight: commandColumn.implicitHeight
                         boundsBehavior: Flickable.StopAtBounds
                         flickableDirection: Flickable.VerticalFlick
+                        maximumFlickVelocity: 9000
+                        flickDeceleration: 8000
                         interactive: contentHeight > height + 1
+
+                        WheelHandler {
+                            orientation: Qt.Vertical
+                            blocking: true
+                            onWheel: function(event) {
+                                var dy = event.pixelDelta.y
+                                if (Math.abs(dy) < 1) dy = event.angleDelta.y * 1.4
+                                else dy = dy * 2
+                                var maxY = Math.max(0, commandList.contentHeight - commandList.height)
+                                commandList.contentY = Math.max(0, Math.min(maxY, commandList.contentY - dy))
+                            }
+                        }
 
                         ScrollBar.vertical: ScrollBar {
                             policy: commandList.contentHeight > commandList.height ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
